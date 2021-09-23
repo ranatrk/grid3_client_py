@@ -5,35 +5,7 @@ MODULE_NAME = "TfgridModule"
 
 class Twin(InterfaceClient):
 
-    # createTwin creates an entity with given name
-    # async def createTwin(self, ip, callback):
-    #     create_res = self.interface.query(module="tfgridModule", storage_function="createTwin", params=[ip])
-
-    #     nonce_res = self.interface.query(module="system", storage_function="accountNextIndex", params=[ip])
-
-    #     # create = self.api.tx.tfgridModule.createTwin(ip)
-    #     nonce = await self.api.rpc.system.accountNextIndex(self.address)
-
-    #     return create.signAndSend(self.key, {nonce}, callback)
-
-    # addTwinEntity adds an entity to a twin object
-    # the signature is a signature provided by the entity that is added.
-    # the signature is composed of twinID-entityID as bytes signed by the entity's private key
-    # to proof that he in fact approved to be part of this twin
-    # async function addTwinEntity (self, twinID, entityID, signature, callback) {
-    #   const create = self.api.tx.tfgridModule.addTwinEntity(twinID, entityID, signature)
-    #   const nonce = await self.api.rpc.system.accountNextIndex(self.address)
-
-    #   return create.signAndSend(self.key, { nonce }, callback)
-    # }
-
-    # # deleteTwinEntity delets an entity from a twin
-    # async function deleteTwinEntity (self, twinID, entityID, callback) {
-    #   const remove = self.api.tx.tfgridModule.deleteTwinEntity(twinID, entityID)
-    #   const nonce = await self.api.rpc.system.accountNextIndex(self.address)
-
-    #   return remove.signAndSend(self.key, { nonce }, callback)
-    # }
+    # create creates an entity with given name
     def create(self, ip):
         if not ip:
             raise ValueError("Ip should be provided")
@@ -49,7 +21,7 @@ class Twin(InterfaceClient):
             return submitted_extrinsic
         # TODO check submit
 
-    # getTwin gets a twin by id
+    # get gets a twin by id
     def get(self, id):
         try:  # TODO validations
             id = int(id)
@@ -94,6 +66,10 @@ class Twin(InterfaceClient):
         else:
             raise RuntimeError(submitted_extrinsic.error_message)
 
+    # addTwinEntity adds an entity to a twin object
+    # the signature is a signature provided by the entity that is added.
+    # the signature is composed of twinID-entityID as bytes signed by the entity's private key
+    # to proof that he in fact approved to be part of this twin
     def add_twin_entity(self, twin_id, entity_id, signature):  # TODO TEST/VERIFY
 
         submitted_extrinsic = self.submit_signed_extrinsic(
@@ -106,6 +82,7 @@ class Twin(InterfaceClient):
         else:
             raise RuntimeError(submitted_extrinsic.error_message)
 
+    # deleteTwinEntity delets an entity from a twin
     def delete_twin_entity(self, twin_id, entity_id):  # TODO TEST/VERIFY
         submitted_extrinsic = self.submit_signed_extrinsic(
             call_module=MODULE_NAME,
@@ -117,12 +94,3 @@ class Twin(InterfaceClient):
         else:
             raise RuntimeError(submitted_extrinsic.error_message)
 
-
-# module.exports = {
-#   createTwin,
-#   getTwin,
-#   deleteTwin,
-#   addTwinEntity,
-#   deleteTwinEntity,
-#   listTwins
-# }

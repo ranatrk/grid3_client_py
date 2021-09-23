@@ -19,8 +19,6 @@ from twin import Twin
 from farm import Farm
 from contract import Contract
 
-# custom_type_registry = load_type_registry_file("types.json")
-
 
 class Client:
     def __init__(self, url="", words="", type_registry=None):

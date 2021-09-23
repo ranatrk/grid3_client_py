@@ -8,17 +8,12 @@ class Contract(InterfaceClient):
 
     # createContract creates a contract
     def create(self, nodeID, data, hash, numberOfPublicIPs):
-        # create = self.api.tx.smartContractModule.createContract(nodeID, data, hash, numberOfPublicIPs)
-        # nonce = await self.api.rpc.system.accountNextIndex(self.address)
-
-        # return create.signAndSend(self.key, {nonce}, callback)
         params = {"node_id": nodeID, "data": data, "deployment_hash": hash, "public_ips": numberOfPublicIPs}
 
         submitted_extrinsic = self.submit_signed_extrinsic(
             call_module=MODULE_NAME, call_function="create_contract", call_params=params
         )
 
-        # check submitted_extrinsic.is_success
         if submitted_extrinsic:
             if submitted_extrinsic.is_success and submitted_extrinsic.finalized:
                 return True
@@ -28,8 +23,6 @@ class Contract(InterfaceClient):
     # getContract gets an contract by id or (hash and node id)
     def get(self, id: int = None, data_hash: str = None, node_id: int = None):
         """
-
-        Args:
             id (int): contract id only
             OR
             hash (str): data hash contract was created with
