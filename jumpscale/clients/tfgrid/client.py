@@ -15,64 +15,76 @@
 # const { createContract, updateContract, cancelContract, getContract } = require('./contract')
 import json
 from substrateinterface import Keypair, KeypairType, SubstrateInterface
-from twin import Twin
-from farm import Farm
-from contract import Contract
+from .twin import Twin
+from .farm import Farm
+from .contract import Contract
 
+from jumpscale.clients.base import Client
+from jumpscale.core.base import fields
+from jumpscale.loader import j
 
-class Client:
-    def __init__(self, url="", words="", type_registry=None):
+TYPES_PATH = "jumpscale/clients/tfgrid/types.json"
+
+class TfgridClient(Client):
+    url = fields.String()
+    words = fields.String()
+    type_registry = fields.Typed(dict)
+    keypair = fields.Typed(Keypair)
+    interface = fields.Typed(SubstrateInterface)
+
+    def __init__(self, url="", words="", type_registry=None, **kwargs):
+        super().__init__(url=url, words=words, type_registry=type_registry, **kwargs)
         self.url = url
         self.words = words or self.generatMnemonic()
-        self._keypair = None
-        self._interface = None
-        self._type_registry = type_registry or None
+        self.keypair = Keypair.create_from_mnemonic(self.words, crypto_type=KeypairType.ED25519)
+        self.type_registry = type_registry or j.data.serializers.json.load_from_file(TYPES_PATH)
+        self.interface = SubstrateInterface(url=self.url, ss58_format=42, type_registry=self.type_registry)
 
-        self._twin = None
-        self._farm = None
-        self._contract = None
+        self.twin = Twin(self.interface, self.keypair)
+        self.farm = Farm(self.interface, self.keypair)
+        self.contract = Contract(self.interface, self.keypair)
 
-    @property
-    def type_registry(self):
-        if not self._type_registry:
-            f = open("types.json")
-            self._type_registry = json.load(f)
+    # @property
+    def load_type_registry(self):
+        # if not self._type_registry:
+        # f = open("types.json")
+        # self.type_registry = json.load(f)
+        self.type_registry = j.data.serializers.json.load_from_file(TYPES_PATH) 
+        return self.type_registry
 
-        return self._type_registry
+    # @property
+    # def interface(self):
+    #     if not self._interface:
+    #         self._interface = SubstrateInterface(url=self.url, ss58_format=42, type_registry=self.type_registry)
+    #     return self._interface
 
-    @property
-    def interface(self):
-        if not self._interface:
-            self._interface = SubstrateInterface(url=self.url, ss58_format=42, type_registry=self.type_registry)
-        return self._interface
-
-    @property
-    def keypair(self):
-        if not self._keypair:
-            self._keypair = Keypair.create_from_mnemonic(self.words, crypto_type=KeypairType.ED25519)
-        return self._keypair
+    # @property
+    # def keypair(self):
+    #     if not self._keypair:
+    #         self._keypair = Keypair.create_from_mnemonic(self.words, crypto_type=KeypairType.ED25519)
+    #     return self._keypair
 
     @property
     def address(self):
         return self.keypair.ss58_address
 
-    @property
-    def twin(self):
-        if not self._twin:
-            self._twin = Twin(self.interface, self.keypair)
-        return self._twin
+    # @property
+    # def twin(self):
+    #     if not self._twin:
+    #         self._twin = Twin(self.interface, self.keypair)
+    #     return self._twin
 
-    @property
-    def farm(self):
-        if not self._farm:
-            self._farm = Farm(self.interface, self.keypair)
-        return self._farm
+    # @property
+    # def farm(self):
+    #     if not self._farm:
+    #         self._farm = Farm(self.interface, self.keypair)
+    #     return self._farm
 
-    @property
-    def contract(self):
-        if not self._contract:
-            self._contract = Contract(self.interface, self.keypair)
-        return self._contract
+    # @property
+    # def contract(self):
+    #     if not self._contract:
+    #         self._contract = Contract(self.interface, self.keypair)
+    #     return self._contract
 
     def generatMnemonic(self):
         return Keypair.generate_mnemonic()

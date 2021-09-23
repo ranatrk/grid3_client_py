@@ -1,4 +1,4 @@
-from interface_client import InterfaceClient
+from .interface_client import InterfaceClient
 
 MODULE_NAME = "TfgridModule"
 
