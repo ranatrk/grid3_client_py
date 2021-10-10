@@ -56,7 +56,7 @@ class TfgridClient(Client):
     @property
     def interface(self):
         if not self._interface:
-            self._interface = SubstrateInterface(url=self.url, ss58_format=42, type_registry=self.type_registry)
+            self._interface = SubstrateInterface(url=self.url, ss58_format=42, type_registry=self.type_registry, type_registry_preset="polkadot")
         return self._interface
 
     @property
