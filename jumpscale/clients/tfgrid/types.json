@@ -79,7 +79,8 @@
         ["ipv4", "Vec<u8>"],
         ["ipv6", "Vec<u8>"],
         ["gw4", "Vec<u8>"],
-        ["gw6", "Vec<u8>"]
+        ["gw6", "Vec<u8>"],
+        ["domain", "Vec<u8>"]
       ]
     },
     "Location": {
@@ -132,6 +133,8 @@
         ["cu", "Policy"],
         ["nu", "Policy"],
         ["ipu", "Policy"],
+        ["unique_name", "Policy"],
+        ["domain_name", "Policy"],
         ["foundation_account", "AccountId"],
         ["certified_sales_account", "AccountId"]
       ]
@@ -153,18 +156,37 @@
         "Terrabytes"
       ]
     },
+    "types::Contract": {
+      "type": "struct",
+      "type_mapping": [
+        ["version", " u32"],
+        ["state", "ContractState"],
+        ["contract_id", "u64"],
+        ["twin_id", "u32"],
+        ["contract_type", "ContractData"]
+      ]
+    },
+    "ContractData": {
+      "type": "enum",
+      "value_list": [
+        ["NodeContract", "NodeContract"],
+        ["NameContract", "NameContract"]
+      ]
+    },
     "types::NodeContract": {
       "type": "struct",
       "type_mapping": [
-        ["version", "u32"],
-        ["contract_id", "u64"],
-        ["twin_id", "u32"],
         ["node_id", "u32"],
-        ["deploy_mentdata", "Vec<u8>"],
+        ["deployment_data", "Vec<u8>"],
         ["deployment_hash", "Vec<u8>"],
         ["public_ips", "u32"],
-        ["state", "ContractState"],
         ["public_ips_list", "Vec<PublicIP>"]
+      ]
+    },
+    "types::NameContract": {
+      "type": "struct",
+      "type_mapping": [
+        ["name", "Vec<u8>"]
       ]
     },
     "types::ContractBillingInformation": {

@@ -6,12 +6,25 @@ MODULE_NAME = "SmartContractModule"
 
 class Contract(InterfaceClient):
 
-    # createContract creates a contract
-    def create(self, nodeID, data, hash, numberOfPublicIPs):
+    # create node contract creates a contract
+    def create_node_contract(self, nodeID, data, hash, numberOfPublicIPs):
         params = {"node_id": nodeID, "data": data, "deployment_hash": hash, "public_ips": numberOfPublicIPs}
 
         submitted_extrinsic = self.submit_signed_extrinsic(
-            call_module=MODULE_NAME, call_function="create_contract", call_params=params
+            call_module=MODULE_NAME, call_function="create_node_contract", call_params=params
+        )
+
+        if submitted_extrinsic:
+            if submitted_extrinsic.is_success and submitted_extrinsic.finalized:
+                return True
+            else:
+                raise RuntimeError(submitted_extrinsic.error_message)
+
+    def create_name_contract(self, name):
+        params = {"name": name}
+
+        submitted_extrinsic = self.submit_signed_extrinsic(
+            call_module=MODULE_NAME, call_function="create_name_contract", call_params=params
         )
 
         if submitted_extrinsic:
@@ -47,6 +60,21 @@ class Contract(InterfaceClient):
 
         return contract
 
+    def get_node_contract(self, id: int = None):  # TODO test
+        """
+            id (int): contract id only
+
+
+        Returns:
+            contract : list of dict
+        """
+        if not id:
+            raise ValueError("No id provided")
+
+        contracts = self.query(module=MODULE_NAME, storage_function="NodeContracts", params=[id])
+
+        return contracts
+
     def update(self, contract_id, data, hash):  # TODO
 
         params = {"contract_id": contract_id, "data": data, "deployment_hash": hash}
@@ -71,4 +99,3 @@ class Contract(InterfaceClient):
                 return True
             else:
                 raise RuntimeError(submitted_extrinsic.error_message)
-

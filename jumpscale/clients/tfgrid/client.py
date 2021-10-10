@@ -24,49 +24,57 @@ from jumpscale.core.base import fields
 from jumpscale.loader import j
 
 TYPES_PATH = "jumpscale/clients/tfgrid/types.json"
+SUBSTRATE_URL = "wss://tfchain.dev.threefold.io/ws"
+
 
 class TfgridClient(Client):
-    url = fields.String()
-    words = fields.String()
+    def reset_keypair(self, value=None):
+        self._keypair = None
+
+    def reset_interface(self, value=None):
+        self._keypair = None
+
+    url = fields.String(required=True, allow_empty=False, on_update=reset_interface)
+    words = fields.Secret(required=True, allow_empty=False, on_update=reset_keypair)
     type_registry = fields.Typed(dict)
-    keypair = fields.Typed(Keypair)
-    interface = fields.Typed(SubstrateInterface)
+    # keypair = fields.Typed(Keypair)
+    # interface = fields.Typed(SubstrateInterface)
 
     def __init__(self, url="", words="", type_registry=None, **kwargs):
         super().__init__(url=url, words=words, type_registry=type_registry, **kwargs)
-        self.url = url
+        self.url = url or SUBSTRATE_URL
         self.words = words or self.generatMnemonic()
-        self.keypair = Keypair.create_from_mnemonic(self.words, crypto_type=KeypairType.ED25519)
+        self._keypair = Keypair.create_from_mnemonic(self.words, crypto_type=KeypairType.ED25519)
+
         self.type_registry = type_registry or j.data.serializers.json.load_from_file(TYPES_PATH)
-        self.interface = SubstrateInterface(url=self.url, ss58_format=42, type_registry=self.type_registry)
+        self._interface = None
 
         self.twin = Twin(self.interface, self.keypair)
         self.farm = Farm(self.interface, self.keypair)
         self.contract = Contract(self.interface, self.keypair)
 
-    # @property
-    def load_type_registry(self):
-        # if not self._type_registry:
-        # f = open("types.json")
-        # self.type_registry = json.load(f)
-        self.type_registry = j.data.serializers.json.load_from_file(TYPES_PATH) 
-        return self.type_registry
+    @property
+    def interface(self):
+        if not self._interface:
+            self._interface = SubstrateInterface(url=self.url, ss58_format=42, type_registry=self.type_registry)
+        return self._interface
 
-    # @property
-    # def interface(self):
-    #     if not self._interface:
-    #         self._interface = SubstrateInterface(url=self.url, ss58_format=42, type_registry=self.type_registry)
-    #     return self._interface
-
-    # @property
-    # def keypair(self):
-    #     if not self._keypair:
-    #         self._keypair = Keypair.create_from_mnemonic(self.words, crypto_type=KeypairType.ED25519)
-    #     return self._keypair
+    @property
+    def keypair(self):
+        if not self._keypair:
+            self._keypair = Keypair.create_from_mnemonic(self.words, crypto_type=KeypairType.ED25519)
+        return self._keypair
 
     @property
     def address(self):
         return self.keypair.ss58_address
+
+    def load_default_type_registry(self):
+        # if not self._type_registry:
+        # f = open("types.json")
+        # self.type_registry = json.load(f)
+        self.type_registry = j.data.serializers.json.load_from_file(TYPES_PATH)
+        return self.type_registry
 
     # @property
     # def twin(self):
