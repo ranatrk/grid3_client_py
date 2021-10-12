@@ -6,6 +6,7 @@ from jumpscale.core.base import fields
 
 class RmbHttp(Client):
     proxy_url = fields.String()
+    twin_id = fields.Integer()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -16,7 +17,7 @@ class RmbHttp(Client):
         elif not destination:
             raise ValueError("The message destination is empty")
 
-    def prepare(self, command: str, destination: list, expiration: int, retry: int) -> dict:
+    def prepare(self, command: str, destination: list, expiration: int = 30, retry: int = 5) -> dict:
         if not destination:
             raise ValueError("destination needs to be provided")
         msg = {
@@ -25,7 +26,7 @@ class RmbHttp(Client):
             "cmd": command,
             "exp": expiration,
             "dat": "",
-            "src": destination[0] or 0,
+            "src": self.twin_id,
             "dst": destination,
             "ret": "",
             "try": retry,
@@ -59,7 +60,7 @@ class RmbHttp(Client):
                 return message
             except Exception as e:
                 if i < retries:
-                    j.logger.warning(f"trial {i}: cannot send the message, Message: {str(e)}")
+                    j.logger.warning(f"trial {i+1}: cannot send the message, Message: {str(e)}")
                 else:
                     raise e
 
@@ -76,12 +77,12 @@ class RmbHttp(Client):
 
         for i in range(retries):
             try:
-                j.logger.info(f"Reading trial {i}: {url}")
+                j.logger.info(f"Reading trial {i+1}: {url}")
                 res = j.tools.http.post(url)
                 return res.json()
             except Exception as e:
                 if i < retries:
-                    j.logger.warning(f"trial {i}: cannot read the message, Message: {str(e)}")
+                    j.logger.warning(f"trial {i+1}: cannot read the message, Message: {str(e)}")
                 else:
                     raise e
         return {}
