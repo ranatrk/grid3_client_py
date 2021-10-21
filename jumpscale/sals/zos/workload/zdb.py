@@ -22,21 +22,6 @@ class Zdb(Data):
     disk_type = fields.Enum(DeviceTypes)
     public = fields.Boolean()
 
-    # def __init__(
-    #     self,
-    #     namespace: str = "",
-    #     size: int = 0,
-    #     mode: ZdbModes = ZdbModes.seq,
-    #     password: str = "",
-    #     disk_type: DeviceTypes = DeviceTypes.hdd,
-    #     public: bool = False,
-    # ):
-    #     self.namespace = namespace
-    #     self.size = size
-    #     self.mode = mode
-    #     self.password = password
-    #     self.disk_type = disk_type
-    #     self.public = public
     @property
     def capacity(self):
         if self.disk_type == DeviceType.HDD:
@@ -45,26 +30,8 @@ class Zdb(Data):
             return Capacity(sru=self.size)
 
 
-# def challenge(self):
-
-#     out = ""
-#     out += self.size or ""
-#     out += self.mode.value
-#     out += self.password
-#     out += self.disk_type.value
-#     out += self.public
-
-#     return out
-
-
 class ZdbResult(Data):
     name = fields.String()
     namespace = fields.String()
     ips = fields.List(fields.IPAddress())
     port = fields.Integer()
-
-    # def __init__(self, name: str = "", namespace: str = "", ips: list = None, port: int = 0):
-    #     self.name = name
-    #     self.namespace = namespace
-    #     self.ips = ips or []
-    #     self.port = port

@@ -1,13 +1,6 @@
 from enum import Enum
 from io import StringIO
-
-# from typing import List, Union
-
-# from workload.ipv4 import PublicIP
-# from workload.zdb import Zdb, ZdbResult
-# from workload.zmachine import Zmachine, ZmachineResult
-# from workload.zmount import Zmount, ZmountResult
-# from workload.znet import Znet
+import importlib
 
 
 from jumpscale.core.base import Base, fields
@@ -28,9 +21,9 @@ class Challengeable(Base):
             return issubclass(value_or_type, Challengeable)
         return isinstance(value_or_type, Challengeable)
 
-        # def get_value_challenge(self, value):
-        #     if isinstance(value, dict):
-        #         return "".join([f"{k}={v}" for k, v in sorted(value.items())])
+    def get_value_challenge(self, value):
+        if isinstance(value, dict):
+            return "".join([f"{k}={v}" for k, v in sorted(value.items())])
 
         if isinstance(value, (list, tuple, set)):
             return "".join(map(str, value))
@@ -71,18 +64,19 @@ class ResultStates(Enum):
 
 
 class WorkloadTypes(Enum):
-    zmachine = "zmachine"
-    zmount = "zmount"
-    network = "network"
-    zdb = "zdb"
-    ipv4 = "ipv4"
+    Zmachine = "zmachine"
+    Zmount = "zmount"
+    Znet = "network"
+    Zdb = "zdb"
+    Ipv4 = "ipv4"
 
 
-# class WorkloadData(Enum):
-#     Zmount,
-#     Zdb,
-#     Zmachine,
-#     Znet
+# class WorkloadDataClasses(Enum):
+#     Zmount = Zmount,
+#     Zdb = Zdb,
+#     Zmachine = Zmachine,
+#     Znet = Znet,
+#     Ipv4 = Ipv4
 
 
 class Result(Base):
@@ -111,12 +105,6 @@ class DeviceType(Enum):
 class ACE(Base):
     twin_ids = fields.List(fields.Integer())
     rights = fields.List(fields.Enum(Right))
-    # the administrator twin id
-    # twin_ids: number[];
-    # rights: Right[];
-    # def __init__(self, twin_ids: list = None, rights: list = None):
-    #     self.twin_ids = twin_ids or []
-    #     self.rights = rights or []
 
 
 class DeploymentResult(Base):
@@ -124,12 +112,6 @@ class DeploymentResult(Base):
     state = fields.Object(ResultStates)
     error = fields.String()
     data = fields.String()
-
-    # def __init__(self, created: int = 0, state: ResultStates = None, error: str = "", data: str = ""):
-    #     self.created = created
-    #     self.state = state
-    #     self.error = error
-    #     self.data = data  # also json.RawMessage
 
 
 class Capacity(Base):
@@ -147,7 +129,7 @@ class Data(Challengeable):
 
 
 class Workload(Challengeable):
-    SKIP_CHALLENGE = ["id", "created", "to_delete", "result", "signature"]
+    SKIP_CHALLENGE = ["name", "id", "created", "to_delete", "result", "signature"]
 
     def signature(self):
         io = StringIO()
@@ -157,6 +139,18 @@ class Workload(Challengeable):
         # sk => identity secret
         return challenge
 
+    @classmethod
+    def from_dict(cls, data):
+        workload_obj = cls(**data)
+
+        # Manually load data into its type eg: zmount, zmachine..etc objects
+        data_type_class_name = WorkloadTypes(data["type"]).name
+        data_type_module = importlib.import_module(f"jumpscale.sals.zos.workload.{data['type']}")
+        data_obj = getattr(data_type_module, data_type_class_name)(**data["data"])
+        workload_obj.data = data_obj
+
+        return workload_obj
+
     def data_updated(self, value):
         # update type according to workload
         self.type = WorkloadTypes[type(value).__name__].value
@@ -164,14 +158,17 @@ class Workload(Challengeable):
     version = fields.Integer()
     name = fields.String()
     type = fields.Enum(WorkloadTypes)
-    data = fields.Object(Data, on_update=data_updated)
-    # data = Union[Zmount, Znet, Zmachine, Zdb, PublicIP] # FIXME TODO
     metadata = fields.String()
     description = fields.String()
+    data = fields.Object(Data, on_update=data_updated)
     # result = fields.Object(DeploymentResult)
-
-    # id = fields.String()
-    # created = fields.DateTime()
-    # to_delete = fields.Boolean()
-    # signature = fields.String(compute=get_signature)
     result = fields.Object(Result)
+
+    # def challenge(self):
+    #     out = ""
+    #     out += str(self.version)
+    #     out += self.type.value
+    #     out += self.metadata
+    #     out += self.description
+    #     out += self.data.challenge()
+    #     return out

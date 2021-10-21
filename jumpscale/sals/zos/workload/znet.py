@@ -9,24 +9,6 @@ class Peer(Data):
     allowed_ips = fields.List(fields.String())
     endpoint = fields.String()
 
-    # def __init__(self, subnet: str = "", wireguard_public_key: str = "", allowed_ips: list = None, endpoint: str = ""):
-    #     self.subnet = subnet
-    #     # wireguard public key, curve25519
-    #     self.wireguard_public_key = wireguard_public_key
-    #     self.allowed_ips = allowed_ips or []
-    #     # ipv4 or ipv6
-    #     # can be empty, one of the 2 need to be filled in though
-    #     self.endpoint = endpoint
-
-    # def challenge(self):
-    #     out = ""
-    #     out += self.wireguard_public_key
-    #     out += self.endpoint
-    #     out += self.subnet
-    #     for ip in self.allowed_ips:
-    #         out += ip
-    #     return out
-
 
 # wg network reservation (znet)
 class Znet(Data):
@@ -38,32 +20,6 @@ class Znet(Data):
     # needs to be a private subnet
     subnet = fields.String()
     ip_range = fields.String()
-    # wireguard private key, curve25519
-    wireguard_private_key = fields.String()
-    # >1024?
+    wireguard_private_key = fields.String()  # wireguard private key, curve25519
     wireguard_listen_port = fields.Integer()
     peers = fields.List(fields.Object(Peer))
-
-    # def __init__(
-    #     self,
-    #     subnet: str = "",
-    #     ip_range: str = "",
-    #     wireguard_private_key: str = "",
-    #     wireguard_listen_port: int = 0,
-    #     peers: list = None,
-    # ):
-    #     self.subnet = subnet
-    #     self.ip_range = ip_range
-    #     self.wireguard_private_key = wireguard_private_key
-    #     self.wireguard_listen_port = wireguard_listen_port
-    #     self.peers = peers or []
-
-    # def challenge(self):
-    #     out = ""
-    #     out += self.ip_range
-    #     out += self.subnet
-    #     out += self.wireguard_private_key
-    #     out += str(self.wireguard_listen_port) if self.wireguard_listen_port else ""
-    #     for peer in self.peers:
-    #         out += peer.challenge()
-    #     return out
