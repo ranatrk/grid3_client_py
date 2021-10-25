@@ -1,4 +1,3 @@
-import pdb
 from jumpscale.loader import j
 from jumpscale.clients.base import Client
 from jumpscale.core.base import fields
@@ -37,7 +36,7 @@ class RmbHttp(Client):
         return msg
 
     def send(self, message: dict, payload: str):
-        message["dat"] = str(j.data.serializers.base64.encode(payload))
+        message["dat"] = str(j.data.serializers.base64.encode(payload), "utf-8")
         destination = message.get("dst", [])
         retries = message.get("try", 1)
 
