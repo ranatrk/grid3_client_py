@@ -68,9 +68,9 @@
         ["country", "Vec<u8>"],
         ["city", "Vec<u8>"],
         ["public_config", "Option<PublicConfig>"],
-        ["uptime", "u64"],
         ["created", "u64"],
-        ["farming_policy_id", "u32"]
+        ["farming_policy_id", "u32"],
+        ["interfaces", "Vec<Interface>"]
       ]
     },
     "PublicConfig": {
@@ -90,6 +90,13 @@
         ["latitude", "Vec<u8>"]
       ]
     },
+    "types::Location": {
+      "type": "struct",
+      "type_mapping": [
+        ["longitude", "Vec<u8>"],
+        ["latitude", "Vec<u8>"]
+      ]
+    },
     "Resources": {
       "type": "struct",
       "type_mapping": [
@@ -97,6 +104,31 @@
         ["sru", "u64"],
         ["cru", "u64"],
         ["mru", "u64"]
+      ]
+    },
+    "types::Resources": {
+      "type": "struct",
+      "type_mapping": [
+        ["hru", "u64"],
+        ["sru", "u64"],
+        ["cru", "u64"],
+        ["mru", "u64"]
+      ]
+    },
+    "Interface": {
+      "type": "struct",
+      "type_mapping": [
+        ["name", "Vec<u8>"],
+        ["mac", "Vec<u8>"],
+        ["ips", "Vec<Vec<u8>>"]
+      ]
+    },
+    "types::Interface": {
+      "type": "struct",
+      "type_mapping": [
+        ["name", "Vec<u8>"],
+        ["mac", "Vec<u8>"],
+        ["ips", "Vec<Vec<u8>>"]
       ]
     },
     "CertificationType": {
@@ -159,7 +191,7 @@
     "types::Contract": {
       "type": "struct",
       "type_mapping": [
-        ["version", " u32"],
+        ["version", "u32"],
         ["state", "ContractState"],
         ["contract_id", "u64"],
         ["twin_id", "u32"],
@@ -168,12 +200,12 @@
     },
     "ContractData": {
       "type": "enum",
-      "value_list": [
+      "type_mapping": [
         ["NodeContract", "NodeContract"],
         ["NameContract", "NameContract"]
       ]
     },
-    "types::NodeContract": {
+    "NodeContract": {
       "type": "struct",
       "type_mapping": [
         ["node_id", "u32"],
@@ -183,7 +215,7 @@
         ["public_ips_list", "Vec<PublicIP>"]
       ]
     },
-    "types::NameContract": {
+    "NameContract": {
       "type": "struct",
       "type_mapping": [
         ["name", "Vec<u8>"]
@@ -258,11 +290,19 @@
         ["amount_billed", "u128"]
       ]
     },
+    "types::StorageVersion": {
+      "type": "enum",
+      "value_list": [
+        "V1Struct",
+        "V2Struct"
+      ]
+    },
     "types::Address": "MultiAddress",
     "types::LookupSource": "MultiAddress",
     "types::BalanceOf": "Balance",
     "types::Public": "[u8;32]",
     "types::U16F16": "[u8; 4]",
+    "types::BufferIndex": "u32",
     "types::VestingInfo": {
       "type": "struct",
       "type_mapping": [
@@ -278,6 +318,52 @@
       "type_mapping": [
         ["amount", "Balance"],
         ["target", "MultiAddress"]
+      ]
+    },
+    "MintTransaction": {
+      "type": "struct",
+      "type_mapping": [
+        ["amount", "u64"],
+        ["target", "AccountId"],
+        ["block", "BlockNumber"],
+        ["votes", "u32"]
+      ]
+    },
+    "BurnTransaction": {
+      "type": "struct",
+      "type_mapping": [
+        ["block", "BlockNumber"],
+        ["amount", "u64"],
+        ["target", "Vec<u8>"],
+        ["signatures", "Vec<StellarSignature>"],
+        ["sequence_number", "u64"]
+      ]
+    },
+    "RefundTransaction": {
+      "type": "struct",
+      "type_mapping": [
+        ["block", "BlockNumber"],
+        ["amount", "u64"],
+        ["target", "Vec<u8>"],
+        ["tx_hash", "Vec<u8>"],
+        ["signatures", "Vec<StellarSignature>"],
+        ["sequence_number", "u64"]
+      ]
+    },
+    "StellarSignature": {
+      "type": "struct",
+      "type_mapping": [
+        ["signature", "Vec<u8>"],
+        ["stellar_pubkey", "Vec<u8>"]
+      ]
+    },
+    "Burn": {
+      "type": "struct",
+      "type_mapping": [
+        ["target", "AccountId"],
+        ["amount", "BalanceOf"],
+        ["block", "BlockNumber"],
+        ["message", "Vec<u8>"]
       ]
     },
     "types::AccountInfo": "AccountInfoWithProviders"
