@@ -15,7 +15,8 @@ class Contract(InterfaceClient):
         )
 
         if submitted_extrinsic:
-            if submitted_extrinsic.is_success and submitted_extrinsic.finalized:
+
+            if submitted_extrinsic.finalized and submitted_extrinsic.is_success:
                 return True
             else:
                 raise RuntimeError(submitted_extrinsic.error_message)
@@ -75,12 +76,12 @@ class Contract(InterfaceClient):
 
         return contracts
 
-    def update(self, contract_id, data, hash):  # TODO
+    def update_node_contract(self, contract_id, data, hash):  # TODO
 
         params = {"contract_id": contract_id, "data": data, "deployment_hash": hash}
 
         submitted_extrinsic = self.submit_signed_extrinsic(
-            call_module=MODULE_NAME, call_function="update_contract", call_params=params
+            call_module=MODULE_NAME, call_function="update_node_contract", call_params=params
         )
 
         # check submitted_extrinsic.is_success
