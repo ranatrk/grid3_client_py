@@ -199,19 +199,8 @@ def test():
         read_result = rmb_proxy_client.read(send_result)
         j.logger.info(f"Deployment result from rmb-proxy read : {read_result}")
 
-        # rmb = new MessageBusClient(6379)
-        # msg = rmb.prepare("zos.deployment.update", [node_twin_id], 0, 2)
-        # rmb.send(msg, payload)
-
-        # rmb.read(msg, function (result) {
-        #     print("result received")
-        #     print(result)
-        # })
-
-        # TODO send payload over http to rmb-proxy
-
     deploy()
-    # await update()
+    # update()
 
 
 print(test())

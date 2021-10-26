@@ -1,12 +1,5 @@
 import asyncio
 
-# from jumpscale.sals.zos.workload.network import Znet, Peer
-# from jumpscale.sals.zos.workload.zmount import Zmount
-# from jumpscale.sals.zos.workload.zmachine import Zmachine, ZmachineNetwork, ZNetworkInterface, Mount, ComputeCapacity
-# from jumpscale.sals.zos.workload.ipv4 import Ipv4
-
-# from jumpscale.sals.zos.workload.computecapacity import ComputeCapacity
-from jumpscale.sals.zos.workload import Workload, WorkloadTypes
 from jumpscale.sals.zos.deployment import Deployment, SignatureRequirement, SignatureRequest
 from jumpscale.loader import j
 
