@@ -4,7 +4,7 @@ from jumpscale.core.base import fields
 
 
 class RmbHttp(Client):
-    proxy_url = fields.String()
+    proxy_url = fields.String(default="")
     twin_id = fields.Integer()
 
     def __init__(self, *args, **kwargs):
