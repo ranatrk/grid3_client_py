@@ -110,8 +110,8 @@ class ACE(Base):
 class DeploymentResult(Base):
     created = fields.Integer()
     state = fields.Object(ResultStates)
-    error = fields.String()
-    data = fields.String()
+    error = fields.String(default="")
+    data = fields.String(default="")
 
 
 class Capacity(Base):
@@ -141,6 +141,8 @@ class Workload(Challengeable):
 
     @classmethod
     def from_dict(cls, data):
+        if isinstance(data, Workload):
+            return data
         workload_obj = cls(**data)
 
         # Manually load data into its type eg: zmount, zmachine..etc objects
@@ -156,10 +158,10 @@ class Workload(Challengeable):
         self.type = WorkloadTypes[type(value).__name__].value
 
     version = fields.Integer()
-    name = fields.String()
+    name = fields.String(default="")
     type = fields.Enum(WorkloadTypes)
-    metadata = fields.String()
-    description = fields.String()
+    metadata = fields.String(default="")
+    description = fields.String(default="")
     data = fields.Object(Data, on_update=data_updated)
     # result = fields.Object(DeploymentResult)
     result = fields.Object(Result)

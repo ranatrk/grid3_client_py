@@ -15,4 +15,4 @@ class Zmount(Data):
 
 
 class ZmountResult(Data):
-    volume_id = fields.String()
+    volume_id = fields.String(default="")

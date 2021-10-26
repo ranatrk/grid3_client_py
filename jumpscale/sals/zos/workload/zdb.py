@@ -15,10 +15,10 @@ class DeviceTypes(Enum):
 
 
 class Zdb(Data):
-    namespace = fields.String()
+    namespace = fields.String(default="")
     size = fields.Integer()
     mode = fields.Enum(ZdbModes)
-    password = fields.String()
+    password = fields.String(default="")
     disk_type = fields.Enum(DeviceTypes)
     public = fields.Boolean()
 
@@ -31,7 +31,7 @@ class Zdb(Data):
 
 
 class ZdbResult(Data):
-    name = fields.String()
-    namespace = fields.String()
+    name = fields.String(default="")
+    namespace = fields.String(default="")
     ips = fields.List(fields.IPAddress())
     port = fields.Integer()
