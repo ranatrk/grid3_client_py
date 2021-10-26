@@ -27,7 +27,7 @@ class SignatureRequest(Base):
 
 class Signature(Base):
     twin_id = fields.Integer()
-    signature = fields.String()
+    signature = fields.String(default="")
 
 
 class SignatureRequirement(Base):
@@ -78,8 +78,8 @@ class Deployment(Base):
 
     version = fields.Integer()
     twin_id = fields.Integer()
-    metadata = fields.String()
-    description = fields.String()
+    metadata = fields.String(default="")
+    description = fields.String(default="")
     expiration = fields.Integer()
     workloads = WorkloadsField()
     signature_requirement = fields.Object(SignatureRequirement)
@@ -115,7 +115,7 @@ class Deployment(Base):
         return hashlib.md5(self.challenge().encode()).hexdigest()
 
     def sign(self, twin_id, mnemonic):
-        message = self.challenge_hash()
+        message = "0x" + self.challenge_hash()
         # message_bytes = self.from_hex(message)
 
         # keyr = keyring.Keyring({ type: 'ed25519' }) # TODO
@@ -123,6 +123,7 @@ class Deployment(Base):
         # signed_msg = key.sign(message_bytes)
 
         keypair = Keypair.create_from_mnemonic(mnemonic, crypto_type=KeypairType.ED25519)
+
         signed_msg = keypair.sign(message)[2:]
         # hex_signed_msg = self.to_hex(signed_msg)
         for sig in self.signature_requirement.signatures:
