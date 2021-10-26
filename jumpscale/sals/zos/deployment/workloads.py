@@ -2,7 +2,7 @@ from jumpscale.core.base import Base, fields, StoredFactory
 from jumpscale.core.base.fields import List
 
 from jumpscale.sals.zos.workload import Workload, WorkloadTypes
-from jumpscale.sals.zos.workload.znet import Znet, Peer
+from jumpscale.sals.zos.workload.network import Znet, Peer
 from jumpscale.sals.zos.workload.zmount import Zmount
 from jumpscale.sals.zos.workload.zmachine import Zmachine, ZmachineNetwork, ZNetworkInterface, Mount, ComputeCapacity
 from jumpscale.sals.zos.workload.zdb import Zdb
@@ -52,7 +52,7 @@ class Workloads(list):
         zmachine_workload = Workload(
             version=version,
             name=name,
-            type=WorkloadTypes.zmachine,
+            type=WorkloadTypes.Zmachine,
             data=zmachine,
             metadata=metadata,
             description=description,
@@ -69,7 +69,7 @@ class Workloads(list):
         zmount_workload = Workload(
             version=version,
             name=name,
-            type=WorkloadTypes.zmount,
+            type=WorkloadTypes.Zmount,
             data=zmount,
             metadata=metadata,
             description=description,
@@ -90,27 +90,27 @@ class Workloads(list):
         wireguard_listen_port,
         peers: list,
     ):
-        # peer = Peer(
-        #     subnet="10.240.2.0/24",
-        #     wireguard_public_key="cEzVprB7IdpLaWZqYOsCndGJ5MBgv1q1lTFG1B2Czkc=",
-        #     allowed_ips=["10.240.2.0/24", "100.64.240.2/32"],
-        # )
+
+        peer_objs = []
+        for peer in peers:
+            peer_obj = Peer(
+                subnet=peer["subnet"],
+                wireguard_public_key=peer["wireguard_public_key"],
+                allowed_ips=peer["allowed_ips"],
+                endpoint=peer["endpoint"],
+            )
+            peer_objs.append(peer_obj)
 
         znet = Znet(
             subnet=znet_subnet,
             ip_range=ip_range,
             wireguard_private_key=wireguard_private_key,
             wireguard_listen_port=wireguard_listen_port,
-            peers=peers,
+            peers=peer_objs,
         )
 
         znet_workload = Workload(
-            version=version,
-            name=name,
-            type=WorkloadTypes.network,
-            data=znet,
-            metadata=metadata,
-            description=description,
+            version=version, name=name, type=WorkloadTypes.Znet, data=znet, metadata=metadata, description=description,
         )
         self.append(znet_workload)
         return znet_workload
@@ -119,7 +119,7 @@ class Workloads(list):
         zdb = Zdb(namespace=namespace, size=size, mode=mode, password=password, disk_type=disk_type, public=public)
 
         zdb_workload = Workload(
-            version=version, name=name, type=WorkloadTypes.zdb, data=zdb, metadata=metadata, description=description,
+            version=version, name=name, type=WorkloadTypes.Zdb, data=zdb, metadata=metadata, description=description,
         )
         self.append(zdb_workload)
         return zdb_workload
@@ -130,7 +130,7 @@ class Workloads(list):
         zpub_ip_workload = Workload(
             version=version,
             name=name,
-            type=WorkloadTypes.ipv4,
+            type=WorkloadTypes.Ipv4,
             data=zpub_ip,
             description=description,
             metadata=metadata,
