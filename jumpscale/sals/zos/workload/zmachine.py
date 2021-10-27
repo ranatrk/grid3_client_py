@@ -48,4 +48,5 @@ class Zmachine(Data):
 class ZmachineResult(Data):
     id = fields.String(default="")
     ip = fields.IPAddress()
+    ygg_ip = fields.String(default="")
     # name unique per deployment, re-used in request & response

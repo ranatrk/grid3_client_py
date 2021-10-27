@@ -15,6 +15,8 @@ class DeviceTypes(Enum):
 
 
 class Zdb(Data):
+    SKIP_CHALLENGE = ["namespace", "disk_type"]
+
     namespace = fields.String(default="")
     size = fields.Integer()
     mode = fields.Enum(ZdbModes)
