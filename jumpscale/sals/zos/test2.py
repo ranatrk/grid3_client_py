@@ -9,6 +9,7 @@ RMB_PROXY_URL = "https://rmbproxy1.devnet.grid.tf"
 def test():
     twin_id = 54
     mnemonic = "magnet wage miracle spirit oval sport input boat glide basic grass spike"
+    # mnemonic = "ice dismiss audit unveil hockey broken upper ridge swift wage donkey series"  # for account TEST
     url = "wss://tfchain.dev.threefold.io/ws"
     node_id = 7
     node_twin_id = 12
@@ -23,7 +24,7 @@ def test():
     signature_requirement = SignatureRequirement(weight_required=1, requests=[signature_request])
 
     deployment = Deployment(
-        version=1,
+        version=0,
         twin_id=twin_id,
         expiration=1626394558,
         metadata="zm dep",
@@ -33,7 +34,7 @@ def test():
 
     # Create zmount workload
     deployment.workloads.add_zmount(
-        name="zmountiaia", version=1, metadata="zm", description="zm test", size=1024 * 1024 * 1024 * 10
+        name="zmountiaia", version=0, metadata="zm", description="zm test", size=1024 * 1024 * 1024 * 10
     )
     # Create zmount workload
     deployment.workloads.add_zmount(

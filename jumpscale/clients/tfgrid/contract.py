@@ -17,7 +17,18 @@ class Contract(InterfaceClient):
         if submitted_extrinsic:
 
             if submitted_extrinsic.finalized and submitted_extrinsic.is_success:
-                return True
+                for event in submitted_extrinsic.triggered_events:
+                    event_dict = event.serialize()
+                    # check for extrinsic success/failure
+                    if (
+                        event_dict.get("module_id", "") == MODULE_NAME
+                        and event_dict.get("event_id", "") == "ContractCreated"
+                    ):
+
+                        attributes = event_dict.get("attributes", [])
+                        results = [item["value"] for item in attributes]
+                        return results
+                return []  ## FIXME
             else:
                 raise RuntimeError(submitted_extrinsic.error_message)
 

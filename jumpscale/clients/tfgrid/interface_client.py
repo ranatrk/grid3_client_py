@@ -1,6 +1,62 @@
 from substrateinterface import Keypair
 from substrateinterface import exceptions as substrateinterface_exceptions, SubstrateInterface
 
+ERRORS_MAP = {
+    "SmartContractModule": [
+        "TwinNotExists",
+        "NodeNotExists",
+        "FarmNotExists",
+        "FarmHasNotEnoughPublicIPs",
+        "FarmHasNotEnoughPublicIPsFree",
+        "FailedToReserveIP",
+        "FailedToFreeIPs",
+        "ContractNotExists",
+        "TwinNotAuthorizedToUpdateContract",
+        "TwinNotAuthorizedToCancelContract",
+        "NodeNotAuthorizedToDeployContract",
+        "NodeNotAuthorizedToComputeReport",
+        "PricingPolicyNotExists",
+        "ContractIsNotUnique",
+        "NameExists",
+        "NameNotValid",
+    ],
+    "TfgridModule": [
+        "NoneValue",
+        "StorageOverflow",
+        "CannotCreateNode",
+        "NodeNotExists",
+        "NodeWithTwinIdExists",
+        "CannotDeleteNode",
+        "NodeDeleteNotAuthorized",
+        "NodeUpdateNotAuthorized",
+        "FarmExists",
+        "FarmNotExists",
+        "CannotCreateFarmWrongTwin",
+        "CannotUpdateFarmWrongTwin",
+        "CannotDeleteFarm",
+        "CannotDeleteFarmWrongTwin",
+        "IpExists",
+        "IpNotExists",
+        "EntityWithNameExists",
+        "EntityWithPubkeyExists",
+        "EntityNotExists",
+        "EntitySignatureDoesNotMatch",
+        "EntityWithSignatureAlreadyExists",
+        "CannotUpdateEntity",
+        "CannotDeleteEntity",
+        "SignatureLenghtIsIncorrect",
+        "TwinExists",
+        "TwinNotExists",
+        "TwinWithPubkeyExists",
+        "CannotCreateTwin",
+        "UnauthorizedToUpdateTwin",
+        "PricingPolicyExists",
+        "PricingPolicyNotExists",
+        "CertificationCodeExists",
+        "FarmingPolicyAlreadyExists",
+    ],
+}
+
 
 class InterfaceClient:
     interface: SubstrateInterface
@@ -47,12 +103,26 @@ class InterfaceClient:
 
     def submit_extrinsic(self, signed_extrinsic, wait_for_inclusion=False, wait_for_finalization=False):
 
-        submited_extrinsic = self.interface.submit_extrinsic(
+        submitted_extrinsic = self.interface.submit_extrinsic(
             extrinsic=signed_extrinsic,
             wait_for_inclusion=wait_for_inclusion,
             wait_for_finalization=wait_for_finalization,
         )
-        return submited_extrinsic
+
+        if submitted_extrinsic.triggered_events:
+            for event in submitted_extrinsic.triggered_events:
+                event_dict = event.serialize()
+                # check for extrinsic success/failure
+
+                if event_dict.get("module_id", "") == "System" and event_dict.get("event_id", "") == "ExtrinsicFailed":
+                    err_attributes = event_dict.get("attributes", [])
+                    # err = err_attributes[0] if err_attributes else ""
+                    err_index = err_attributes[0].get("value", {}).get("Module", {}).get("error", "")
+                    module_name = submitted_extrinsic.extrinsic.value["call"]["call_module"]
+                    raise RuntimeError(
+                        f"Extrinsic Failed for module {module_name} with the following error: {ERRORS_MAP[module_name][err_index]}"
+                    )
+        return submitted_extrinsic
 
     def submit_signed_extrinsic(
         self, call_module, call_function, call_params=None, wait_for_inclusion=True, wait_for_finalization=True
@@ -61,8 +131,7 @@ class InterfaceClient:
         call = self.compose_call(call_module=call_module, call_function=call_function, call_params=call_params)
         signed_extrinsic = self.create_signed_extrinsic(call=call)
 
-        submited_extrinsic = self.submit_extrinsic(
+        submitted_extrinsic = self.submit_extrinsic(
             signed_extrinsic, wait_for_inclusion=wait_for_inclusion, wait_for_finalization=wait_for_finalization
         )
-        return submited_extrinsic
-
+        return submitted_extrinsic
