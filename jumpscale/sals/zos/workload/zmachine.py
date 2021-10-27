@@ -6,6 +6,7 @@ from . import Capacity, Data
 
 
 class ComputeCapacity(Data):
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     cpu = fields.Integer()
     memory = fields.Integer()
 
@@ -15,22 +16,26 @@ class ComputeCapacity(Data):
 
 
 class ZNetworkInterface(Data):
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     network = fields.String(default="")
     ip = fields.String(default="")
 
 
 class ZmachineNetwork(Data):
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     public_ip = fields.String(default="")
     planetary = fields.Boolean()
     interfaces = fields.List(fields.Object(ZNetworkInterface))
 
 
 class Mount(Data):
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     name = fields.String(default="")
     mountpoint = fields.String(default="")
 
 
 class Zmachine(Data):
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     flist = fields.String(default="")
     network = fields.Object(ZmachineNetwork)
     size = fields.Integer()
@@ -46,6 +51,7 @@ class Zmachine(Data):
 
 # response of the deployment
 class ZmachineResult(Data):
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     id = fields.String(default="")
     ip = fields.IPAddress()
     ygg_ip = fields.String(default="")

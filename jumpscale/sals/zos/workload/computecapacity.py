@@ -3,6 +3,7 @@ from . import Capacity, Data
 
 
 class ComputeCapacity(Data):
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     cpu = fields.Integer()
     memory = fields.Integer()
 

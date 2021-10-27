@@ -6,6 +6,7 @@ from . import Capacity, Data
 
 
 class Zmount(Data):
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     size = fields.Integer()
 
     @property
@@ -15,4 +16,5 @@ class Zmount(Data):
 
 
 class ZmountResult(Data):
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     volume_id = fields.String(default="")

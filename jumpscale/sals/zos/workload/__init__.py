@@ -157,6 +157,7 @@ class Workload(Challengeable):
         # update type according to workload
         self.type = WorkloadTypes[type(value).__name__].value
 
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     version = fields.Integer()
     name = fields.String(default="")
     type = fields.Enum(WorkloadTypes)

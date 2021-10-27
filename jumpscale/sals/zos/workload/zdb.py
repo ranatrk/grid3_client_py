@@ -16,7 +16,7 @@ class DeviceTypes(Enum):
 
 class Zdb(Data):
     SKIP_CHALLENGE = ["namespace", "disk_type"]
-
+    # WARNING Fields order shouldn't be changed. If changed challenge will fail
     namespace = fields.String(default="")
     size = fields.Integer()
     mode = fields.Enum(ZdbModes)
