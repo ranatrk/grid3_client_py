@@ -1,29 +1,16 @@
-# const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api')
-# const crypto = require('@polkadot/util-crypto')
-# const types = require('../types.json')
-# const bip39 = require('bip39')
-
-# const { getEntity, deleteEntity, createEntity, updateEntity, listEntities, getEntityIDByName, getEntityIDByPubkey } = require('./entity')
-# const { createTwin, getTwin, deleteTwin, addTwinEntity, deleteTwinEntity, listTwins } = require('./twin')
-# const { createFarm, getFarm, deleteFarm, listFarms, addFarmIP, deleteFarmIP } = require('./farms')
-# const { createNode, updateNode, getNode, getNodeIDByPubkey, deleteNode, listNodes } = require('./node')
-# const { signEntityTwinID, signEntityCreation } = require('./sign')
-# const { getPrice } = require('./price')
-# const { vestedTransfer } = require('./vesting')
-# const { getBalance, transfer } = require('./balance')
-# const { proposeTransaction, voteTransaction, listValidators } = require('./voting')
-# const { createContract, updateContract, cancelContract, getContract } = require('./contract')
-import json
+import os
 from substrateinterface import Keypair, KeypairType, SubstrateInterface
 from .twin import Twin
 from .farm import Farm
 from .contract import Contract
+from .entity import Entity
 
 from jumpscale.clients.base import Client
 from jumpscale.core.base import fields
 from jumpscale.loader import j
 
-TYPES_PATH = "jumpscale/clients/tfgrid/types.json"
+BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+TYPES_PATH = f"{BASE_PATH}/types.json"  # TODO fix path
 SUBSTRATE_URL = "wss://tfchain.dev.threefold.io/ws"
 
 
@@ -56,7 +43,9 @@ class TfgridClient(Client):
     @property
     def interface(self):
         if not self._interface:
-            self._interface = SubstrateInterface(url=self.url, ss58_format=42, type_registry=self.type_registry, type_registry_preset="polkadot")
+            self._interface = SubstrateInterface(
+                url=self.url, ss58_format=42, type_registry=self.type_registry, type_registry_preset="polkadot"
+            )
         return self._interface
 
     @property
