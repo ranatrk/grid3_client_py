@@ -38,18 +38,16 @@ class Twin(InterfaceClient):
 
         return twin_obj
 
-    # def get_id(self, ip: str):
-    #     if not ip:
-    #         raise ValueError("You must pass a valip ip")
+    def get_id(self, public_key: str):
+        if not public_key:
+            raise ValueError("You must pass a valip public_key")
 
-    #     twin_id = self.query(
-    #         module=MODULE_NAME, storage_function="TwinIdByAccountID", params=[ip]
-    #     )  # TODO add await for async
+        twin_id = self.query(module=MODULE_NAME, storage_function="TwinIdByAccountID", params=[public_key])
 
-    #     if twin_id["AccountId"] != ip:
-    #         raise KeyError("No such twin found")
+        if not twin_id:
+            raise KeyError("No such twin found")
 
-    #     return twin_id
+        return twin_id
 
     # List all twins
     def list(self):
@@ -93,4 +91,3 @@ class Twin(InterfaceClient):
             return submitted_extrinsic
         else:
             raise RuntimeError(submitted_extrinsic.error_message)
-
