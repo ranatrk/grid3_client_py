@@ -38,14 +38,14 @@ class Twin(InterfaceClient):
 
         return twin_obj
 
-    def get_id(self, public_key: str):
+    def get_id(self, public_key: str = None):
         if not public_key:
-            raise ValueError("You must pass a valip public_key")
+            public_key = self.keypair.public_key
 
         twin_id = self.query(module=MODULE_NAME, storage_function="TwinIdByAccountID", params=[public_key])
 
         if not twin_id:
-            raise KeyError("No such twin found")
+            raise KeyError("No twin found")
 
         return twin_id
 
