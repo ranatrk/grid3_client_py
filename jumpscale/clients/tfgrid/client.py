@@ -39,6 +39,7 @@ class TfgridClient(Client):
         self.twin = Twin(self.interface, self.keypair)
         self.farm = Farm(self.interface, self.keypair)
         self.contract = Contract(self.interface, self.keypair)
+        self.entity = Entity(self.interface, self.keypair)
 
     @property
     def interface(self):
@@ -59,9 +60,6 @@ class TfgridClient(Client):
         return self.keypair.ss58_address
 
     def load_default_type_registry(self):
-        # if not self._type_registry:
-        # f = open("types.json")
-        # self.type_registry = json.load(f)
         self.type_registry = j.data.serializers.json.load_from_file(TYPES_PATH)
         return self.type_registry
 
