@@ -14,7 +14,6 @@ class Peer(Data):
 class Znet(Data):
     # WARNING Fields order shouldn't be changed. If changed challenge will fail
 
-    # SKIP_CHALLENGE = ["wiregaurd_listen_port"]
     # unique nr for each network chosen, this identified private networks as connected to a container or vm or ...
     # corresponds to the 2nd number of a class B ipv4 address
     # is a class C of a chosen class B

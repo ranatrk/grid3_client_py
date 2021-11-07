@@ -135,8 +135,6 @@ class Workload(Challengeable):
         io = StringIO()
         self.challenge(io)
         challenge = io.getvalue()
-        # should return hex(ed25519.sign(sk, challenge)
-        # sk => identity secret
         return challenge
 
     @classmethod
@@ -166,12 +164,3 @@ class Workload(Challengeable):
     data = fields.Object(Data, on_update=data_updated)
     # result = fields.Object(DeploymentResult)
     result = fields.Object(Result)
-
-    # def challenge(self):
-    #     out = ""
-    #     out += str(self.version)
-    #     out += self.type.value
-    #     out += self.metadata
-    #     out += self.description
-    #     out += self.data.challenge()
-    #     return out

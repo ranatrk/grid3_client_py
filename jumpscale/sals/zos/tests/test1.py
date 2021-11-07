@@ -70,7 +70,7 @@ def test():
 
     znetwork_interface = ZNetworkInterface(network="testznetwork1", ip="10.240.1.5")
 
-    zmachine_network = ZmachineNetwork(planetary=True, interfaces=[znetwork_interface], public_ip="")
+    zmachine_network = ZmachineNetwork(planetary=True, interfaces=[znetwork_interface], public_ip="zpub")
 
     compute_capacity = ComputeCapacity(cpu=1, memory=1024 * 1024 * 1024 * 2)
 
