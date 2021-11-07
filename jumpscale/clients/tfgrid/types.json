@@ -302,6 +302,7 @@
     "types::BalanceOf": "Balance",
     "types::Public": "[u8;32]",
     "types::U16F16": "[u8; 4]",
+    "U16F16": "[u8; 4]",
     "types::BufferIndex": "u32",
     "types::VestingInfo": {
       "type": "struct",
