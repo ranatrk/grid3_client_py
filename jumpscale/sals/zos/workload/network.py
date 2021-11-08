@@ -1,5 +1,5 @@
 from jumpscale.core.base import Base, fields
-from . import Data
+from . import Data, DeploymentResultData
 
 #  is a remote wireguard client which can connect to this node
 class Peer(Data):
@@ -24,3 +24,7 @@ class Znet(Data):
     wireguard_private_key = fields.String(default="")  # wireguard private key, curve25519
     wireguard_listen_port = fields.Integer()
     peers = fields.List(fields.Object(Peer))
+
+
+class ZnetResult(DeploymentResultData):
+    pass

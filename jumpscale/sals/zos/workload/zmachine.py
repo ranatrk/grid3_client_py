@@ -2,7 +2,7 @@
 
 
 from jumpscale.core.base import Base, fields
-from . import Capacity, Data
+from . import Capacity, Data, DeploymentResultData
 
 
 class ComputeCapacity(Data):
@@ -49,8 +49,7 @@ class Zmachine(Data):
         return Capacity(sru=self.size)
 
 
-# response of the deployment
-class ZmachineResult(Data):
+class ZmachineResult(DeploymentResultData):
     # WARNING Fields order shouldn't be changed. If changed challenge will fail
     id = fields.String(default="")
     ip = fields.IPAddress()

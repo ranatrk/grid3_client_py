@@ -1,7 +1,7 @@
 from enum import Enum
 
 from jumpscale.core.base import Base, fields
-from . import Capacity, DeviceType, Data
+from . import Capacity, DeviceType, Data, DeploymentResultData
 
 
 class ZdbModes(Enum):
@@ -32,7 +32,7 @@ class Zdb(Data):
             return Capacity(sru=self.size)
 
 
-class ZdbResult(Data):
+class ZdbResult(DeploymentResultData):
     name = fields.String(default="")
     namespace = fields.String(default="")
     ips = fields.List(fields.IPAddress())

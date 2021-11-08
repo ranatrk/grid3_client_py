@@ -1,5 +1,5 @@
 from jumpscale.core.base import Base, fields
-from . import Capacity, Data
+from . import Capacity, Data, DeploymentResultData
 
 
 class ComputeCapacity(Data):
@@ -20,3 +20,7 @@ class ComputeCapacity(Data):
     @property
     def capacity(self):
         return Capacity(cru=self.cpu, mru=self.memory)
+
+
+class ComputeCapacityResult(DeploymentResultData):
+    pass

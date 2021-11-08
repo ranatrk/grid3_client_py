@@ -83,12 +83,6 @@ class Result(Base):
     pass
 
 
-# class WorkloadDataResult(Enum):
-#     ZmountResult,
-#     ZdbResult,
-#     ZmachineResult
-
-
 class Right(Enum):
     restart = "restart"
     delete = "delete"
@@ -107,11 +101,15 @@ class ACE(Base):
     rights = fields.List(fields.Enum(Right))
 
 
+class DeploymentResultData(Base):
+    pass
+
+
 class DeploymentResult(Base):
-    created = fields.Integer()
-    state = fields.Object(ResultStates)
-    error = fields.String(default="")
-    data = fields.String(default="")
+    created = fields.Integer(default=0)
+    state = fields.Enum(ResultStates)
+    message = fields.String(default="")
+    data = fields.Object(DeploymentResultData)
 
 
 class Capacity(Base):
@@ -148,6 +146,8 @@ class Workload(Challengeable):
         data_type_module = importlib.import_module(f"jumpscale.sals.zos.workload.{data['type']}")
         data_obj = getattr(data_type_module, data_type_class_name)(**data["data"])
         workload_obj.data = data_obj
+        # Manually load each data type's result
+        workload_obj.result.data = getattr(data_type_module, data_type_class_name + "Result")(**data["result"]["data"])
 
         return workload_obj
 
@@ -162,5 +162,4 @@ class Workload(Challengeable):
     metadata = fields.String(default="")
     description = fields.String(default="")
     data = fields.Object(Data, on_update=data_updated)
-    # result = fields.Object(DeploymentResult)
-    result = fields.Object(Result)
+    result = fields.Object(DeploymentResult)

@@ -2,7 +2,7 @@
 
 #  ONLY possible on SSD
 from jumpscale.core.base import Base, fields
-from . import Capacity, Data
+from . import Capacity, Data, DeploymentResultData
 
 
 class Zmount(Data):
@@ -15,6 +15,6 @@ class Zmount(Data):
         return Capacity(sru=self.size)
 
 
-class ZmountResult(Data):
+class ZmountResult(DeploymentResultData):
     # WARNING Fields order shouldn't be changed. If changed challenge will fail
     volume_id = fields.String(default="")
