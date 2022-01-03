@@ -1,4 +1,5 @@
 import os
+from enum import Enum
 from substrateinterface import Keypair, KeypairType, SubstrateInterface
 from .twin import Twin
 from .farm import Farm
@@ -11,7 +12,12 @@ from jumpscale.loader import j
 
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 TYPES_PATH = f"{BASE_PATH}/types.json"  # TODO fix path
-SUBSTRATE_URL = "wss://tfchain.dev.threefold.io/ws"
+SUBSTRATE_URL = "wss://tfchain.dev.grid.tf/ws"
+
+
+class KeypairTypeEnum(Enum):
+    SR25519 = KeypairType.SR25519
+    ED25519 = KeypairType.ED25519
 
 
 class TfgridClient(Client):
@@ -24,14 +30,17 @@ class TfgridClient(Client):
     url = fields.String(required=True, allow_empty=False, on_update=reset_interface)
     words = fields.Secret(required=True, allow_empty=False, on_update=reset_keypair)
     type_registry = fields.Typed(dict)
+    crypto_type = fields.Enum(KeypairTypeEnum)
     # keypair = fields.Typed(Keypair)
     # interface = fields.Typed(SubstrateInterface)
 
-    def __init__(self, url="", words="", type_registry=None, **kwargs):
-        super().__init__(url=url, words=words, type_registry=type_registry, **kwargs)
+    def __init__(self, url="", words="", type_registry=None, crypto_type="SR25519", **kwargs):
+        super().__init__(
+            url=url, words=words, type_registry=type_registry, crypto_type=KeypairTypeEnum[crypto_type], **kwargs
+        )
         self.url = url or SUBSTRATE_URL
         self.words = words or self.generatMnemonic()
-        self._keypair = Keypair.create_from_mnemonic(self.words, crypto_type=KeypairType.ED25519)
+        self._keypair = Keypair.create_from_mnemonic(self.words, crypto_type=self.crypto_type.value)  # FIXME
 
         self.type_registry = type_registry or j.data.serializers.json.load_from_file(TYPES_PATH)
         self._interface = None
@@ -52,7 +61,7 @@ class TfgridClient(Client):
     @property
     def keypair(self):
         if not self._keypair:
-            self._keypair = Keypair.create_from_mnemonic(self.words, crypto_type=KeypairType.ED25519)
+            self._keypair = Keypair.create_from_mnemonic(self.words, crypto_type=self.crypto_type.value)  # FIXME
         return self._keypair
 
     @property
@@ -60,65 +69,33 @@ class TfgridClient(Client):
         return self.keypair.ss58_address
 
     def load_default_type_registry(self):
+        """Load default type registry json to object type_registry"""
         self.type_registry = j.data.serializers.json.load_from_file(TYPES_PATH)
         return self.type_registry
 
-    # @property
-    # def twin(self):
-    #     if not self._twin:
-    #         self._twin = Twin(self.interface, self.keypair)
-    #     return self._twin
+    # def sign_twin_entity(self, entity_id):
+    #     # TODO
+    #     import hashlib
 
-    # @property
-    # def farm(self):
-    #     if not self._farm:
-    #         self._farm = Farm(self.interface, self.keypair)
-    #     return self._farm
+    #     twin_id = self.twin.get_id()
+    #     if not twin_id:
+    #         raise ValueError("No twin with twin id found")
 
-    # @property
-    # def contract(self):
-    #     if not self._contract:
-    #         self._contract = Contract(self.interface, self.keypair)
-    #     return self._contract
+    #     entity = self.entity.get(entity_id=entity_id)
+    #     if not entity_id:
+    #         raise ValueError("No entity with entity id found")
+
+    #     message = "0x" + self.challenge_hash()
+
+    #     out = bytearray()
+    #     out += entity_id.to_bytes(4, "big")
+    #     out += twin_id.to_bytes(4, "big")
+    #     message = hashlib.md5(out.encode()).hexdigest()
+    #     signed_msg = self.keypair.sign(message)[2:]
+    #     # return self.keypair.sign(out.decode())[2:]
 
     def generatMnemonic(self):
         return Keypair.generate_mnemonic()
-
-
-# async init () {
-#   const api = await getPolkaAPI(this.url)
-#   const keyring = new Keyring({ type: 'ed25519' })
-
-#   if (!this.words) {
-#     this.words = crypto.mnemonicGenerate()
-#   } else {
-#     if (!bip39.validateMnemonic(this.words)) {
-#       throw Error('Invalid mnemonic! Must be bip39 compliant')
-#     }
-#   }
-
-#   const key = keyring.addFromMnemonic(this.words)
-#   this.key = key
-#   console.log(`Key with address: ${this.key.address} is loaded.`)
-
-#   this.keyring = keyring
-#   this.address = this.key.address
-
-#   this.api = api
-# }
-
-# async createMnemonic () {
-#   return crypto.mnemonicGenerate()
-# }
-
-# async def sign(self,entity_id, twin_id):
-#   out = bytearray()
-#   # out += name.encode()
-#   out += entity_id.to_bytes(4, "big")
-#   out += twin_id.to_bytes(4, "big")
-#   return self.keypair.sign(out.decode())[2:]
-
-#   # return signEntityTwinID(this, entityID, twinID)
 
 
 # async def signEntityCreation(self, name, country_id, city_id):
@@ -138,40 +115,12 @@ class TfgridClient(Client):
 #     return createEntity(this, target, name, countryID, cityID, signature, callback)
 #   }
 
-#   async getEntityByID (id) {
-#     return getEntity(this, id)
-#   }
-
-#   async getEntityIDByName (name) {
-#     return getEntityIDByName(this, name)
-#   }
-
-#   async getEntityIDByPubkey (pubkey) {
-#     return getEntityIDByPubkey(this, pubkey)
-#   }
-
 #   async listEntities () {
 #     return listEntities(this)
 #   }
 
 #   async deleteEntity (callback) {
 #     return deleteEntity(this, callback)
-#   }
-
-#   async createTwin (ip, callback) {
-#     return createTwin(this, ip, callback)
-#   }
-
-#   async getTwinByID (id) {
-#     return getTwin(this, id)
-#   }
-
-#   async listTwins () {
-#     return listTwins(this)
-#   }
-
-#   async deleteTwin (id, callback) {
-#     return deleteTwin(this, id, callback)
 #   }
 
 #   async addTwinEntity (twinID, entityID, signature, callback) {
@@ -182,53 +131,6 @@ class TfgridClient(Client):
 #     return deleteTwinEntity(this, twinID, entityID, callback)
 #   }
 
-#   async createFarm (name, certificationType, publicIPs, callback) {
-#     return createFarm(this, name, certificationType, publicIPs, callback)
-#   }
-
-#   async addFarmIp (id, ip, gateway, callback) {
-#     return addFarmIP(this, id, ip, gateway, callback)
-#   }
-
-#   async deleteFarmIp (id, ip, callback) {
-#     return deleteFarmIP(this, id, ip, callback)
-#   }
-
-#   async getFarmByID (id) {
-#     return getFarm(this, id)
-#   }
-
-#   async listFarms () {
-#     return listFarms(this)
-#   }
-
-#   async deleteFarmByID (id, callback) {
-#     return deleteFarm(this, id, callback)
-#   }
-
-#   async createNode (farmID, resources, location, countryID, cityID, publicConfig, callback) {
-#     return createNode(this, farmID, resources, location, countryID, cityID, publicConfig, callback)
-#   }
-
-#   async updateNode (nodeID, farmID, resources, location, countryID, cityID, publicConfig, callback) {
-#     return updateNode(this, nodeID, farmID, resources, location, countryID, cityID, publicConfig, callback)
-#   }
-
-#   async getNodeByID (id) {
-#     return getNode(this, id)
-#   }
-
-#   async getNodeByPubkey (id) {
-#     return getNodeIDByPubkey(this, id)
-#   }
-
-#   async listNodes () {
-#     return listNodes(this)
-#   }
-
-#   async deleteNode (id, callback) {
-#     return deleteNode(this, id, callback)
-#   }
 
 #   async getPrice () {
 #     return getPrice(this)
@@ -258,38 +160,7 @@ class TfgridClient(Client):
 #     return voteTransaction(this, transactionID, callback)
 #   }
 
-#   async listValidators () {
-#     return listValidators(this)
-#   }
 
 #   async verify (message, signature, pubkey) {
 #     return this.key.verify(message, signature, pubkey)
 #   }
-
-#   async createContract (nodeID, data, deploymentHash, publicIPS, callback) {
-#     return createContract(this, nodeID, data, deploymentHash, publicIPS, callback)
-#   }
-
-#   async updateContract (contractID, data, hash, callback) {
-#     return updateContract(this, contractID, data, hash, callback)
-#   }
-
-#   async cancelContract (contractID, callback) {
-#     return cancelContract(this, contractID, callback)
-#   }
-
-#   async getContractByID (id) {
-#     return getContract(this, id)
-#   }
-# }
-
-# async function getPolkaAPI (url) {
-#   if (!url || url === '') {
-#     url = 'ws://localhost:9944'
-#   }
-
-#   const provider = new WsProvider(url)
-#   return ApiPromise.create({ provider, types })
-# }
-
-# module.exports = { Client }

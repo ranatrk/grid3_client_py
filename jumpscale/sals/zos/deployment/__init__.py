@@ -1,14 +1,16 @@
 import hashlib
+from enum import Enum
 from io import StringIO
 from substrateinterface import Keypair, KeypairType
 from jumpscale.core.base import Base, fields, meta
 
-from jumpscale.sals.zos.workload import Workload, WorkloadTypes
+from jumpscale.sals.zos.workload import Workload
 from .workloads import Workloads
 
 
-# var md5 = require('crypto-js/md5');
-# const keyring = require('@polkadot/keyring') TODO
+class KeypairTypeEnum(Enum):
+    SR25519 = KeypairType.SR25519
+    ED25519 = KeypairType.ED25519
 
 
 class SignatureRequest(Base):
@@ -62,19 +64,11 @@ class WorkloadsField(fields.Typed):
     def to_raw(self, loads):
         return [w.to_dict() for w in loads]
 
-    def _get_data(self):
-        # ovverride _get_data from Base to have the data in the form of list of workloads instead of dict of list of workloads
-        # initial {'workloads':[]}  -> to be returned as {}
-        workloads = super(Workloads, self)._get_data()
-
-    to_dict = _get_data
-
 
 # deployment is given to each Zero-OS who needs to deploy something
 # the zero-os'es will only take out what is relevant for them
 # if signature not done on the main Deployment one, nothing will happen
 class Deployment(Base):
-    # SKIP_CHALLENGE = ["name", "contract_id"]
 
     version = fields.Integer()
     twin_id = fields.Integer()
@@ -84,14 +78,6 @@ class Deployment(Base):
     workloads = WorkloadsField()
     signature_requirement = fields.Object(SignatureRequirement)
     contract_id = fields.Integer()
-
-    # def signature(self):
-    #     io = StringIO()
-    #     self.challenge(io)
-    #     challenge = io.getvalue()
-    #     # should return hex(ed25519.sign(sk, challenge)
-    #     # sk => identity secret
-    #     return challenge
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -114,22 +100,13 @@ class Deployment(Base):
     def challenge_hash(self):
         return hashlib.md5(self.challenge().encode()).hexdigest()
 
-    def sign(self, twin_id, mnemonic):
+    def sign(self, twin_id, mnemonic, crypto_type="SR25519"):
         message = "0x" + self.challenge_hash()
-        # message_bytes = self.from_hex(message)
-
-        # keyr = keyring.Keyring({ type: 'ed25519' }) # TODO
-        # key = keyr.addFromMnemonic(mnemonic)
-        # signed_msg = key.sign(message_bytes)
-
-        keypair = Keypair.create_from_mnemonic(mnemonic, crypto_type=KeypairType.ED25519)
+        keypair = Keypair.create_from_mnemonic(mnemonic, crypto_type=KeypairTypeEnum[crypto_type].value)
 
         signed_msg = keypair.sign(message)[2:]
-        # hex_signed_msg = self.to_hex(signed_msg)
         for sig in self.signature_requirement.signatures:
             if sig.twin_id == twin_id:
                 sig.signature = signed_msg
         signature = Signature(twin_id=twin_id, signature=signed_msg)
-        # signature.twin_id = twin_id
-        # signature.signature = signed_msg
         self.signature_requirement.signatures.append(signature)

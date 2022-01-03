@@ -74,7 +74,7 @@ class InterfaceClient:
         try:
             result = self.interface.query(module=module, storage_function=storage_function, params=params)
         except substrateinterface_exceptions.StorageFunctionNotFound as e:
-            raise e  # TODO handle exception
+            raise e
 
         return result.value
 
@@ -83,7 +83,7 @@ class InterfaceClient:
             result_list = self.interface.query_map(module=module, storage_function=storage_function)
             result = [record[1].value for record in result_list.records]
         except substrateinterface_exceptions.StorageFunctionNotFound as e:
-            raise e  # TODO handle exception
+            raise e
 
         return result
 
@@ -93,7 +93,7 @@ class InterfaceClient:
                 call_module=call_module, call_function=call_function, call_params=call_params
             )
         except substrateinterface_exceptions.StorageFunctionNotFound as e:
-            raise e  # TODO handle exception
+            raise e
 
         return call
 
