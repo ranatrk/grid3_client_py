@@ -9,15 +9,15 @@ To create a client, a substrate url needs to be provided and the words/mnemonics
 - **url**: substrate url
 
     Deployed:
-    - Devnet: `"wss://tfchain.dev.threefold.io/ws"` [DEFAULT]
-    - Testnet: `"wss://tfchain.test.threefold.io/ws"`
+    - Devnet: `"wss://tfchain.dev.grid.tf/ws"` [DEFAULT]
+    - Testnet: `"wss://tfchain.test.grid.tf/ws"`
 - **words**: mnemonics generated from account creation
 - **type_registry** (optional): dict with the type registry to be used, if not provided the type registry is loaded from [types.json](types.json)
 
 Example:
 
 ```python
-url = "wss://tfchain.dev.threefold.io/ws"
+url = "wss://tfchain.dev.grid.tf/ws"
 words = "ring today nice tiger obtain neglect little bread client night another welcome"
 tfgrid_client = j.clients.tfgrid.get("test", url, words)
 tfgrid_client.save()

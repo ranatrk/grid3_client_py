@@ -3,14 +3,14 @@ import asyncio
 from jumpscale.sals.zos.deployment import Deployment, SignatureRequirement, SignatureRequest
 from jumpscale.loader import j
 
-RMB_PROXY_URL = "https://rmbproxy1.devnet.grid.tf"
+RMB_PROXY_URL = "https://gridproxy.dev.grid.tf"
 
 
 def test():
-    twin_id = 23
+    twin_id = 74
     mnemonic = "magnet wage miracle spirit oval sport input boat glide basic grass spike"
     # mnemonic = "ice dismiss audit unveil hockey broken upper ridge swift wage donkey series"  # for account TEST
-    url = "wss://tfchain.dev.threefold.io/ws"
+    url = "wss://tfchain.dev.grid.tf/ws"
     node_id = 7
     node_twin_id = 10
     ssh_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCt1LYcIga3sgbip5ejiC6R7CCa34omOwUilR66ZEvUh/u4RpbZ9VjRryVHVDyYcd/qbUzpWMzqzFlfFmtVhPQ0yoGhxiv/owFwStqddKO2iNI7T3U2ytYLJqtPm0JFLB5n07XLyFRplq0W2/TjNrYl51DedDQqBJDq34lz6vTkECNmMKg9Ld0HpxnpHBLH0PsXMY+JMZ8keH9hLBK61Mx9cnNxcLV9N6oA6xRCtwqOdLAH08MMaItYcJ0UF/PDs1PusJvWkvsH5/olgayeAReI6JFGv/x4Eqq5vRJRQjkj9m+Q275gzf9Y/7M/VX7KOH7P9HmDbxwRtOq1F0bRutKF"
@@ -60,7 +60,7 @@ def test():
         peers=[peer],
     )
 
-    # # create a public ip
+    # create a public ip
     deployment.workloads.add_ipv4(
         name="zpub", version=0, description="my zpub ip", metadata="zpub ip",
     )

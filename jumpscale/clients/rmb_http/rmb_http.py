@@ -64,6 +64,8 @@ class RmbHttp(Client):
                     raise e
 
     def read(self, message: dict) -> dict:
+        if not message:
+            raise ValueError("Message to read cannot be empty")
         destination = message.get("dst", [])
         retries = message.get("try", 1)
         retqueue = message.get("ret", "")
@@ -77,8 +79,10 @@ class RmbHttp(Client):
         for i in range(retries):
             try:
                 j.logger.info(f"Reading trial {i+1}: {url}")
-                res = j.tools.http.post(url)
-                return res.json()
+                res = j.tools.http.post(url).json()
+                if res and res[0]["err"]:
+                    raise RuntimeError(res[0]["err"])
+                return res
             except Exception as e:
                 if i < retries:
                     j.logger.warning(f"trial {i+1}: cannot read the message, Message: {str(e)}")

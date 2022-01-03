@@ -12,8 +12,8 @@ rmb_proxy_client = j.clients.rmb_http.get("test", proxy_url=RMB_PROXY_URL, twin_
 
 where `proxy_url` depends on the network being used:
 
-- Devnet: https://rmbproxy1.devnet.grid.tf
-- Testnet: https://rmbproxy1.testnet.grid.tf
+- Devnet: https://gridproxy.dev.grid.tf
+- Testnet: https://gridproxy.test.grid.tf
 
 ## Client usage
 
